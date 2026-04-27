@@ -1,0 +1,18 @@
+- Yêu cầu chức năng giao diện chính:
++ Lựa chọn hiện tối đa bao nhiêu bản ghi
++ Lấy code SQL hay lấy kết quả truy vấn
++ Đăng ký đăng nhập
+
+- Yêu cầu backend:
++ Cần tạo lớp bảo vệ đề phòng nguy hiểm thao tác nguy hiểm lên database
+    + Phòng thủ 1 (Quan trọng nhất): User database kết nối với backend chỉ được là read-only
+    + Phòng thủ 2: Tạo list các từ cấm và hủy các lệnh chứa từ cấm [DELETE, TRUNCATE, DROP,...]
++ Cho phép tự sửa lỗi tối đa 3 lần
+
+- Một số vấn đề:
++ RAG lấy ít hơn số bảng cần thiết: Giải pháp
+    + Lọc theo confident score
+    + Graph based schema
++ Model sinh sql sai: 
+    + Cho thực hiện lại tối đa 3 lần cho chính xác
+    + Sử dụng SQLGlot

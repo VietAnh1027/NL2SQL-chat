@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NL2SQL Portal - Truy vấn</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px;
+            background: #0f172a;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.5px;
+        }
+
+        .cursor {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+        }
+
+        /* Tùy chỉnh thanh cuộn */
+        .chat-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-area::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .chat-area::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        /* Tin nhắn */
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 85%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .message.user .message-sender {
+            color: #7dd3fc;
+        }
+
+        .message.bot .message-sender {
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .message-bubble {
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: #0284c7;
+            color: #f0f9ff;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot .message-bubble {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-bottom-left-radius: 2px;
+            width: 100%;
+        }
+
+        /* Style đặc biệt cho code block chứa SQL */
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            color: #a7f3d0; /* Màu xanh lá nhạt cho code SQL */
+            font-size: 14px;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 20px;
+            background: #0f172a;
+            border-top: 1px solid #334155;
+            display: flex;
+            gap: 12px;
+        }
+
+        .query-input {
+            flex: 1;
+            padding: 14px 18px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #f8fafc;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .query-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
+        .query-input::placeholder {
+            color: #64748b;
+        }
+
+        .send-btn {
+            padding: 0 24px;
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            background: #7dd3fc;
+        }
+
+        .send-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Hiệu ứng loading */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 4px 0;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #38bdf8;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Container chứa các nút (Đảm bảo tất cả nằm trên 1 dòng) */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px; /* Căn chỉnh khoảng cách giữa các phần tử cho đều nhau */
+        }
+
+        /* Định dạng trạng thái */
+        .status-indicator {
+            color: #64748b;
+            font-size: 13px;
+            white-space: nowrap; /* Bắt buộc không cho phép rớt dòng */
+        }
+
+        /* Định dạng dấu phân cách | */
+        .separator {
+            color: #475569; /* Màu mờ, chìm vào nền */
+            font-size: 16px;
+            font-weight: 300;
+            user-select: none; /* Không cho người dùng bôi đen dấu này */
+        }
+
+        /* --- Giữ nguyên toàn bộ CSS của class .user-profile như cũ --- */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 500;
+            background: #0f172a;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            white-space: nowrap; /* Bắt buộc không cho phép rớt dòng */
+        }
+
+        .user-profile:hover {
+            border-color: #ef4444;
+            color: #f87171;
+        }
+
+        .user-profile:hover svg {
+            color: #ef4444;
+        }
+
+        .user-profile:active {
+            transform: translateY(1px);
+        }
+
+        .user-profile svg {
+            color: #38bdf8;
+            transition: color 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="header">
+        <h1>> SYS.NL2SQL_SESSION<span class="cursor">_</span></h1>
+        
+        <div class="header-actions">
+            <div class="header-actions">
+                <span class="status-indicator">🟢 Đã kết nối DB</span>
+                
+                <span class="separator">|</span>
+                
+                <button class="user-profile" id="user-profile-btn" title="Nhấn để đăng xuất">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span id="current-username">VietAnh1027</span> 
+                </button>
+            </div>
+        </div>
+    </header>
+
+        <main class="chat-area" id="chat-area">
+            <div class="message bot">
+                <div class="message-sender">BOT</div>
+                <div class="message-bubble">
+                    Xin chào. Hệ thống chuyển đổi ngôn ngữ tự nhiên sang SQL đã sẵn sàng. Vui lòng nhập yêu cầu truy vấn của bạn.
+                </div>
+            </div>
+        </main>
+
+        <footer class="input-area">
+            <input type="text" id="query-input" class="query-input" placeholder="Ví dụ: Lấy danh sách nhân viên có lương lớn hơn 20 triệu..." autocomplete="off">
+            <button id="send-btn" class="send-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        const logoutBtn = document.getElementById("user-profile-btn");
+        const chatArea = document.getElementById('chat-area');
+        const queryInput = document.getElementById('query-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // URL của API LLM (Cập nhật endpoint của bạn tại đây, ví dụ: FastAPI chạy ở cổng 8000)
+        const API_ENDPOINT = "http://localhost:8000/api/generate-sql"; 
+
+        logoutBtn.addEventListener('click', function(e){
+            const isConfirmed = confirm("Bạn có muốn đăng xuất khỏi hệ thống không?");
+            if(isConfirmed){
+                window.location.href = "logout/";
+            }
+        })
+
+        function appendMessage(sender, text, isCode = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+
+            const senderDiv = document.createElement('div');
+            senderDiv.classList.add('message-sender');
+            senderDiv.textContent = sender === 'user' ? 'USER' : 'BOT';
+
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.classList.add('message-bubble');
+
+            if (isCode) {
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.textContent = text;
+                pre.appendChild(code);
+                bubbleDiv.appendChild(pre);
+            } else {
+                bubbleDiv.textContent = text;
+            }
+
+            messageDiv.appendChild(senderDiv);
+            messageDiv.appendChild(bubbleDiv);
+            chatArea.appendChild(messageDiv);
+            
+            // Cuộn xuống cuối cùng
+            scrollToBottom();
+        }
+
+        function appendTypingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'bot');
+            messageDiv.id = 'typing-indicator';
+
+            const senderDiv = document.createElement('div');
+            senderDiv.classList.add('message-sender');
+            senderDiv.textContent = 'HỆ THỐNG';
+
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.classList.add('message-bubble');
+            bubbleDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            `;
+
+            messageDiv.appendChild(senderDiv);
+            messageDiv.appendChild(bubbleDiv);
+            chatArea.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        function scrollToBottom() {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        async function handleSend() {
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            // 1. Hiển thị tin nhắn người dùng
+            appendMessage('user', query);
+            queryInput.value = '';
+            
+            // 2. Hiển thị trạng thái đang tải
+            appendTypingIndicator();
+
+            try {
+                // 3. Gọi API đến Backend LLM
+                /* --- BỎ COMMENT ĐOẠN NÀY ĐỂ KẾT NỐI API THẬT ---
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: query })
+                });
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                const sqlQuery = data.sql_query; // Điều chỉnh field name theo response của bạn
+                */
+
+                // MOCK DATA (Dùng để test giao diện khi chưa có backend)
+                const mockResponse = await new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve("SELECT \n  employee_id,\n  full_name,\n  department,\n  salary\nFROM employees\nWHERE salary > 20000000\nORDER BY salary DESC;");
+                    }, 1500); // Giả lập độ trễ của LLM là 1.5s
+                });
+                const sqlQuery = mockResponse;
+
+                // 4. Xóa trạng thái tải và in kết quả SQL
+                removeTypingIndicator();
+                appendMessage('bot', sqlQuery, true);
+
+            } catch (error) {
+                console.error('Error fetching SQL:', error);
+                removeTypingIndicator();
+                appendMessage('bot', '-- Lỗi kết nối đến máy chủ LLM. Vui lòng kiểm tra lại API Endpoint.', true);
+            }
+        }
+
+        // Bắt sự kiện click nút gửi
+        sendBtn.addEventListener('click', handleSend);
+
+        // Bắt sự kiện nhấn phím Enter
+        queryInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleSend();
+            }
+        });
+    </script>
+</body>
+</html>

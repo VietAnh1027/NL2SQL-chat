@@ -1,0 +1,60 @@
+{
+"table_name": "Users",
+"table_description": "Stores user account information, including their unique identifier, full name, email, hashed password, phone number, and creation timestamp.",
+"columns_summary": "user_id: unique identifier | full_name: user's full name | email: user's email address | password_hash: hashed password for security | phone: user's phone number | created_at: timestamp when the user account was created",
+"sample_data": "Row 1: 1, 'John Doe', 'john.doe@example.com', 'hashed_password_1', '123-456-7890', '2023-10-01 10:00:00' | Row 2: 2, 'Jane Smith', 'jane.smith@example.com', 'hashed_password_2', '987-654-3210', '2023-10-02 11:00:00' | Row 3: 3, 'Alice Johnson', 'alice.johnson@example.com', 'hashed_password_3', '555-555-5555', '2023-10-03 12:00:00'"
+}
+{
+"table_name": "Categories",
+"table_description": "Stores information about different categories used in the system, including a unique identifier, name, and optional description.",
+"columns_summary": "category_id: unique identifier | category_name: name of the category | description: optional description of the category",
+"sample_data": "Row 1: 1, 'Electronics', 'Products related to electronics' | Row 2: 2, 'Books', 'Books and literature' | Row 3: 3, 'Clothing', 'Clothing items'"
+}
+{
+"table_name": "Products",
+"table_description": "Stores information about products available in the system, including their unique identifier, name, price, stock quantity, description, and category ID.",
+"columns_summary": "product_id: unique identifier | product_name: name of the product | price: price of the product | stock_quantity: current stock quantity | description: product description | category_id: foreign key referencing Categories.category_id",
+"sample_data": "Row 1: 1, 'Laptop', 999.99, 10, 'High-performance laptop with SSD', 1 | Row 2: 2, 'Smartphone', 499.99, 20, 'Latest smartphone with 5G connectivity', 2 | Row 3: 3, 'Tablet', 299.99, 15, 'Compact tablet with high-resolution display', 3"
+}
+{
+"table_name": "Shopping_Cart",
+"table_description": "Tracks shopping carts for users, including the cart ID, user ID, creation timestamp, and a foreign key reference to the Users table.",
+"columns_summary": "cart_id: unique identifier for the shopping cart | user_id: identifier for the associated user | created_at: timestamp when the cart was created |",
+"sample_data": "Row 1: 1, 1, '2023-10-01 12:00:00' | Row 2: 2, 2, '2023-10-02 14:30:00' | Row 3: 3, 3, '2023-10-03 09:15:00'"
+}
+{
+"table_name": "Cart_Items",
+"table_description": "Stores items that are part of a shopping cart, including the cart ID, product ID, and quantity of each item.",
+"columns_summary": "cart_item_id: unique identifier for each cart item | cart_id: reference to the shopping cart | product_id: reference to the product | quantity: number of items in the cart (default 1)",
+"sample_data": "Row 1: 1, 101, 2 | Row 2: 2, 102, 1 | Row 3: 3, 103, 3"
+}
+{
+"table_name": "Orders",
+"table_description": "Records all orders placed by users in the system, including the order ID, user ID, order date, total amount, and current status.",
+"columns_summary": "order_id: unique identifier for each order | user_id: foreign key referencing the Users table | order_date: timestamp of when the order was placed | total_amount: total cost of the order | status: current status of the order (e.g., Pending, Shipped, Delivered)",
+"sample_data": "Row 1: 1, 1, '2023-10-01 12:00:00', 199.99, 'Pending' | Row 2: 2, 2, '2023-10-02 14:30:00', 299.99, 'Shipped' | Row 3: 3, 1, '2023-10-03 09:15:00', 399.99, 'Delivered'"
+}
+{
+"table_name": "Order_Items",
+"table_description": "Stores details about each item included in an order, including the order ID, product ID, quantity purchased, and price at purchase.",
+"columns_summary": "order_item_id: unique identifier for each order item | order_id: reference to the order this item belongs to | product_id: reference to the product being ordered | quantity: number of items purchased | price_at_purchase: price of the item at the time of purchase",
+"sample_data": "Row 1: 1, 101, 2, 19.99 | Row 2: 2, 102, 1, 14.99 | Row 3: 3, 103, 3, 7.99"
+}
+{
+"table_name": "Payments",
+"table_description": "Records financial transactions made during the purchase process, including the order ID, payment method, amount, status, and transaction date.",
+"columns_summary": "payment_id: unique identifier | order_id: reference to the order | payment_method: method used for payment | amount: monetary value of the payment | status: current status of the payment (e.g., Pending, Completed, Failed) | transaction_date: timestamp of when the payment was made",
+"sample_data": "Row 1: 1, 101, 'Credit Card', 199.99, 'Pending', '2023-10-01 12:00:00' | Row 2: 2, 102, 'PayPal', 299.99, 'Completed', '2023-10-02 14:30:00' | Row 3: 3, 103, 'Bank Transfer', 399.99, 'Failed', '2023-10-03 09:15:00'"
+}
+{
+"table_name": "Shipping",
+"table_description": "Tracks shipping details for orders, including the order ID, shipping address, tracking number, current status, and shipment date.",
+"columns_summary": "shipping_id: unique identifier | order_id: reference to the order | shipping_address: address where the package is shipped | tracking_number: unique identifier for tracking the package | status: current status of the shipment (e.g., Preparing, Shipped, Delivered) | shipped_date: date when the package was shipped",
+"sample_data": "Row 1: 1, 101, '123 Main St, Anytown, USA', 'ABC1234567890', 'Shipped', '2023-10-01 14:30:00' | Row 2: 2, 102, '456 Elm St, Othertown, USA', 'XYZ9876543210', 'Delivered', '2023-10-05 10:45:00' | Row 3: 3, 103, '789 Oak St, Somewhere, USA', 'DEF4567890123', 'Preparing', '2023-10-02 09:15:00'"
+}
+{
+"table_name": "Reviews",
+"table_description": "Stores customer reviews for products, including the review ID, user ID, product ID, rating, comment, and review date.",
+"columns_summary": "review_id: unique identifier | user_id: foreign key referencing Users | product_id: foreign key referencing Products | rating: integer between 1 and 5 | comment: text | review_date: timestamp with default current timestamp",
+"sample_data": "Row 1: 1, 1, 1, 4, 'Great product!', '2023-10-01 12:00:00' | Row 2: 2, 2, 2, 5, 'Excellent service!', '2023-10-02 14:30:00' | Row 3: 3, 3, 3, 3, 'Average experience.', '2023-10-03 09:15:00'"
+}

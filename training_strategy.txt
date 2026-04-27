@@ -1,0 +1,16 @@
+Data chia thành 3 bộ
+
+1. Tạo eval dataset
+- Tạo database và đổ dữ liệu vào
+- Lưu vào sqlite để tăng tốc độ eval
+- Tạo eval dataset bao gồm: context, question, answer, rows_answer
+
+2. Áp dụng metrics tính toán
+- Exact match và execution accuracy
+- Về execution accuracy:
+    + Cột rows_answer chứa thông tin query được từ database eval
+    + database đặt trong sqlite giúp tăng tốc độ truy xuất bằng query của LLM
+
+3. Các biểu đồ cần log lại
+- Training loss, Validation loss
+- Execution accuracy và Exact match

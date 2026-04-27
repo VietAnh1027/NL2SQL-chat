@@ -1,0 +1,51 @@
+﻿english_query,RAG_tables
+Show all user profiles created in 2024.,Users
+List the names of all product categories.,Categories
+Find products with a price lower than $50.,Products
+Count the number of pending orders.,Orders
+Retrieve all reviews with a rating of 5.,Reviews
+List products belonging to the 'Electronics' category.,Products Categories
+Show the full name and email of user with ID 10.,Users
+Get the total amount of all orders placed by user 'Alice'.,Users Orders
+List all items currently in the shopping cart of user 5.,Shopping_Cart Cart_Items Products
+Find the average price of products in each category.,Products Categories
+Show all orders that are currently being shipped.,Orders Shipping
+List the products and their quantities for order ID 500.,Order_Items Products
+Find users who have used 'Credit Card' for payment.,Users Orders Payments
+Retrieve the tracking number for order ID 123.,Shipping
+Show the total revenue generated from the 'Furniture' category.,Products Categories Order_Items
+List users who have never placed an order.,Users Orders
+Find the most expensive product ever purchased.,Products Order_Items
+Count how many reviews each product has received.,Products Reviews
+Show the shipping address for the latest order of 'John Smith'.,Users Orders Shipping
+List products that are out of stock (quantity is 0).,Products
+Calculate the total amount paid via 'PayPal' today.,Payments
+Find the average rating given by user 'Bob'.,Users Reviews
+Show order details including product names for user ID 7.,Orders Order_Items Products
+List categories that have more than 10 products.,Categories Products
+Find the total number of items currently in all shopping carts.,Cart_Items
+Retrieve all products reviewed in the last 30 days.,Products Reviews
+Show the payment status for order ID 99.,Payments
+List users who have items in their cart but no orders yet.,Users Shopping_Cart Orders
+Find the best-selling product name in January 2024.,Products Order_Items Orders
+Get the shipping date and status for order ID 45.,Shipping
+Find the names of all products purchased by user 'John Doe'.,Users Orders Order_Items Products
+Show the category names of all items currently in the shopping cart of user 'jane@example.com'.,Users Shopping_Cart Cart_Items Products Categories
+Calculate the total revenue from the 'Electronics' category paid via 'Credit Card'.,Categories Products Order_Items Orders Payments
+List the names of users who gave a 5-star review to any product in the 'Books' category.,Users Reviews Products Categories
+Find the most popular product category among users who registered in 2023.,Users Orders Order_Items Products Categories
+What are the names of the products included in the order with tracking number 'TRACK123'?,Shipping Orders Order_Items Products
+Show the shipping addresses for all orders where the payment status is 'Failed' and the user's phone number starts with '555'.,Payments Orders Users Shipping
+List the email addresses of users who left a 1-star review for products that are currently marked as 'Delayed' in shipping.,Users Reviews Products Order_Items Orders Shipping
+Calculate the total dollar value of the items currently sitting in the shopping cart of the user named 'Alice'.,Users Shopping_Cart Cart_Items Products
+Identify the category that has generated the highest total sales volume in terms of quantity sold.,Categories Products Order_Items Orders
+How many units of 'Wireless Mouse' are currently in transit based on the shipping status 'Shipped'?,Products Order_Items Orders Shipping
+List the full names of users who have an order paid via 'PayPal' that is currently 'Preparing' for shipment.,Users Orders Payments Shipping
+Find all users who purchased 'Smartphone X' and later gave it a review rating lower than 3.,Users Orders Order_Items Products Reviews
+Which user has the highest number of 'Clothing' category items in their active shopping cart?,Categories Products Cart_Items Shopping_Cart Users
+Find the average price of products purchased using 'Bitcoin' in the 'Gaming' category.,Payments Orders Order_Items Products Categories
+Show the comments of 5-star reviews for products belonging to orders that have a 'Returned' shipping status.,Reviews Products Order_Items Orders Shipping
+Get the emails of all users who have reviewed products belonging to the 'Health & Beauty' category.,Categories Products Reviews Users
+List the product names purchased by users created in 2024 whose payment for the order is still 'Pending'.,Users Orders Payments Order_Items Products
+Retrieve the full names and phone numbers of users whose orders have been shipped but the payment status is still 'Pending'.,Shipping Orders Payments Users
+Calculate the total potential revenue of 'Furniture' items currently left in the shopping carts of users who registered in 2024.,Categories Products Cart_Items Shopping_Cart Users

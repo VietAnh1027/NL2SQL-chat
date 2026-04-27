@@ -3,3 +3,4 @@ myenv
 __pycache__
 db.sqlite3
 required.txt
+*.sqlite3

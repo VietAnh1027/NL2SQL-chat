@@ -1,7 +1,18 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from sentence_transformers import SentenceTransformer
+from langchain_chroma import Chroma
 from peft import PeftModel
 import torch
 
+class EmbeddingModel:
+    def __init__(self, model, device):
+        self.model = SentenceTransformer(model, device=device)
+
+    def embed_documents(self,data):
+        return self.model.encode_document(data)
+
+    def embed_query(self, query):
+        return self.model.encode_query(query)
 
 class GenerateSQLCore:
     def __init__(self, model_name, adapter_path, device):
@@ -58,3 +69,7 @@ def readFile(file_path):
         for line in f.readlines():
             text += line
     return text
+
+def filter_schema(vector_store, schema, query, topK):
+    schema_filtered = ""
+    rag_answer = vector_store.similarity_search(schema, k=topK)
