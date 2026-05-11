@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NL2SQL Portal - Admin Dashboard</title>
+    <style>
+        /* Import font chữ */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        /* === CÀI ĐẶT CHUNG === */
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px; 
+            height: 90vh;
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* === HEADER === */
+        .header {
+            padding: 20px;
+            background: #0f172a;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #ef4444; 
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.5px;
+        }
+
+        .cursor { animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .status-indicator { color: #64748b; font-size: 13px; white-space: nowrap; }
+        .separator { color: #475569; font-size: 16px; font-weight: 300; user-select: none; }
+
+        .user-profile {
+            display: flex; align-items: center; gap: 8px;
+            color: #e2e8f0; font-size: 14px; font-weight: 500;
+            background: #0f172a; padding: 6px 12px;
+            border-radius: 6px; border: 1px solid #334155;
+            transition: all 0.2s ease; cursor: pointer;
+            font-family: 'Inter', sans-serif; outline: none; white-space: nowrap;
+        }
+        .user-profile:hover { border-color: #ef4444; color: #f87171; }
+        .user-profile:hover svg { color: #ef4444; }
+        .user-profile svg { color: #ef4444; transition: color 0.2s ease; }
+
+        /* === MAIN LAYOUT === */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr; 
+            gap: 24px;
+            padding: 24px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            color: #38bdf8;
+            font-size: 16px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #334155;
+        }
+
+        /* === CỘT TRÁI: BẢNG USER === */
+        .user-list-section {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .user-list-section::-webkit-scrollbar { width: 6px; }
+        .user-list-section::-webkit-scrollbar-track { background: transparent; }
+        .user-list-section::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; border-bottom: 2px solid #334155; }
+        td { padding: 14px 12px; border-bottom: 1px solid #1e293b; color: #f8fafc; }
+        tr:hover td { background: #1e293b; }
+
+        .role-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .role-admin { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .role-user { background: rgba(56, 189, 248, 0.1); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.2); }
+
+        .btn-delete {
+            background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer;
+            font-size: 13px; transition: all 0.2s;
+        }
+        .btn-delete:hover { background: #991b1b; color: white; }
+
+        /* === CỘT PHẢI: FORM THÊM USER === */
+        .add-user-section {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; /* Thêm scroll nếu form bị dài */
+        }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block; margin-bottom: 8px; font-size: 13px; color: #cbd5e1;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px;
+            background: #1e293b; border: 1px solid #475569;
+            color: #f8fafc; border-radius: 6px; box-sizing: border-box;
+            font-family: 'Inter', sans-serif; font-size: 14px;
+            outline: none; transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+        }
+
+        /* Lớp CSS riêng cho input lỗi */
+        .input-error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
+        }
+
+        .btn-submit {
+            width: 100%; padding: 12px; margin-top: auto;
+            background: #0284c7; color: white;
+            border: none; border-radius: 6px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #0369a1; }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <h1>> ROOT.ADMIN_CONTROL<span class="cursor">_</span></h1>
+            
+            <div class="header-actions">
+                <span class="status-indicator">🟢 Chế độ Quản Trị</span>
+                <span class="separator">|</span>
+                
+                <button class="user-profile" id="user-profile-btn" title="Nhấn để đăng xuất">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span id="current-username">{{ request.user.username }}</span> 
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <main class="main-content">
+            
+            <!-- CỘT TRÁI: DANH SÁCH USER -->
+            <section class="user-list-section">
+                <h2 class="section-title"># DANH SÁCH NHÂN VIÊN</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã NV / Tài khoản</th>
+                            <th>Phân quyền</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users_list %}
+                        <tr id="user-row-{{ u.id }}">
+                            <td style="font-family: 'JetBrains Mono', monospace;">{{ u.username }}</td>
+                            <td>
+                                {% if u.is_superuser %}
+                                    <span class="role-badge role-admin">QUẢN TRỊ VIÊN</span>
+                                {% else %}
+                                    <span class="role-badge role-user">NHÂN VIÊN</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if u.id != request.user.id %}
+                                <button class="btn-delete" onclick="deleteUser({{ u.id }}, '{{ u.username }}')">Xóa</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- CỘT PHẢI: FORM TẠO USER -->
+            <section class="add-user-section">
+                <h2 class="section-title"># CẤP PHÁT TÀI KHOẢN MỚI</h2>
+                
+                <!-- Bổ sung ID cho form để JS bắt sự kiện -->
+                <form id="add-user-form" method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="emp_id">Mã nhân viên (Tên đăng nhập)</label>
+                        <input type="text" id="emp_id" name="username" placeholder="Ví dụ: NV001" required autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Mật khẩu khởi tạo</label>
+                        <input type="password" id="password" name="password" placeholder="Nhập mật khẩu..." required>
+                    </div>
+
+                    <!-- TRƯỜNG XÁC NHẬN MẬT KHẨU (THÊM MỚI) -->
+                    <div class="form-group">
+                        <label for="confirm_password">Xác nhận mật khẩu</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Nhập lại mật khẩu..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Loại tài khoản</label>
+                        <select id="role" name="is_superuser">
+                            <option value="False">Nhân viên (Truy cập chat)</option>
+                            <option value="True">Quản trị viên (Truy cập admin)</option>
+                        </select>
+                    </div>
+
+                    <!-- DÒNG CẢNH BÁO MẬT KHẨU KHÔNG KHỚP (Ẩn mặc định) -->
+                    <p id="password-error" style="color: #ef4444; font-size: 13px; margin-bottom: 10px; display: none; font-weight: 500;">
+                        > Lỗi: Mật khẩu xác nhận không khớp!
+                    </p>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p style="color: #a3e635; font-size: 13px; margin-bottom: 10px;">> {{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+
+                    <button type="submit" class="btn-submit">+ Thêm Nhân Viên</button>
+                </form>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT XỬ LÝ SỰ KIỆN -->
+    <script>
+        // 1. CHỨC NĂNG ĐĂNG XUẤT
+        document.getElementById('user-profile-btn').addEventListener('click', function() {
+            if (confirm("Bạn có muốn đăng xuất khỏi hệ thống quản trị không?")) {
+                window.location.href = "/logout/"; 
+            }
+        });
+
+        // 2. KIỂM TRA MẬT KHẨU TRƯỚC KHI SUBMIT FORM (THÊM MỚI)
+        const addUserForm = document.getElementById('add-user-form');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const passwordError = document.getElementById('password-error');
+
+        if (addUserForm) {
+            addUserForm.addEventListener('submit', function(e) {
+                // Nếu mật khẩu không khớp nhau
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    e.preventDefault(); // Ngăn trình duyệt gửi form về Django
+                    
+                    // Hiển thị dòng cảnh báo màu đỏ
+                    passwordError.style.display = 'block'; 
+                    // Tô đỏ viền ô "Xác nhận mật khẩu"
+                    confirmPasswordInput.classList.add('input-error'); 
+                    // Đưa con trỏ chuột về lại ô xác nhận để người dùng gõ lại
+                    confirmPasswordInput.focus(); 
+                }
+            });
+
+            // Tự động tắt cảnh báo đỏ khi người dùng bắt đầu sửa lại mật khẩu ở 1 trong 2 ô
+            function clearError() {
+                passwordError.style.display = 'none';
+                confirmPasswordInput.classList.remove('input-error');
+            }
+            passwordInput.addEventListener('input', clearError);
+            confirmPasswordInput.addEventListener('input', clearError);
+        }
+
+        // 3. CHỨC NĂNG XÓA USER
+        function deleteUser(userId, username) {
+            const isConfirmed = confirm(`CẢNH BÁO: Bạn có chắc chắn muốn xóa nhân viên [ ${username} ] ra khỏi cơ sở dữ liệu không? Hành động này không thể hoàn tác.`);
+            
+            if (isConfirmed) {
+                fetch(`/api/delete-user/${userId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if(response.ok) {
+                        const row = document.getElementById(`user-row-${userId}`);
+                        if (row) {
+                            row.style.transition = "opacity 0.3s";
+                            row.style.opacity = "0";
+                            setTimeout(() => row.remove(), 300); 
+                        }
+                    } else {
+                        alert("Có lỗi xảy ra từ máy chủ, không thể xóa user.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                    // Dành cho test giao diện:
+                    const row = document.getElementById(`user-row-${userId}`);
+                    row.style.opacity = "0";
+                    setTimeout(() => row.remove(), 300);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

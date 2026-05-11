@@ -1,6 +1,5 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from sentence_transformers import SentenceTransformer
-from langchain_chroma import Chroma
 from peft import PeftModel
 import torch
 
@@ -20,13 +19,12 @@ class GenerateSQLCore:
             model_name, dtype=torch.bfloat16, device_map=device
         )
         self.device = device
-        self.model = PeftModel.from_pretrained(base_model, adapter_path)
+        # self.model = PeftModel.from_pretrained(base_model, adapter_path)
+        self.model = base_model
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model.eval()
 
-    def generate(self, schema, prompt, wrong_response="", debug=False):
-        if wrong_response:
-            wrong_response = f"by modifying this query: '{wrong_response}'"
+    def generate(self, schema, query, wrong_sql="", error_msg="", debug=False):
         messages = [
             {
                 "role": "system",
@@ -38,9 +36,24 @@ CRITICAL RULES:
 3. DO NOT wrap the SQL query in markdown formatting blocks (e.g., strictly NO ```sql or ``` tags). Return raw text only.
 
 Schema: \n{schema}""",
-            },
-            {"role": "user", "content": f"{prompt} {wrong_response}"},
+            }
         ]
+
+        if wrong_sql and error_msg:
+            user_prompt = (
+                """CRITICAL RULES:
+1. Output EXACTLY ONE valid SQL query.
+2. DO NOT include any greetings, explanations, or conversational text before or after the query.
+3. DO NOT wrap the SQL query in markdown formatting blocks (e.g., strictly NO ```sql or ``` tags). Return raw text only."""
+                f"Question: {query}\n\n"
+                f"You previously generated the following SQL which caused an error:\n{wrong_sql}\n\n"
+                f"Error Message from Database/Parser:\n{error_msg}\n\n"
+                f"Please fix the SQL query to resolve this exact error. Output only the corrected SQL."
+            )
+        else:
+            user_prompt = query
+
+        messages.append({"role": "user", "content": user_prompt})
 
         input_text = self.tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
@@ -52,7 +65,7 @@ Schema: \n{schema}""",
             prompt_length = tokens["input_ids"].shape[1]
 
             output = self.model.generate(
-                **tokens, max_new_tokens=200, pad_token_id=self.tokenizer.eos_token_id
+                **tokens, max_new_tokens=512, pad_token_id=self.tokenizer.eos_token_id
             )
 
             if not debug:
@@ -62,14 +75,12 @@ Schema: \n{schema}""",
             response = self.tokenizer.decode(final_tokens, skip_special_tokens=True)
             return response.strip()
 
-
-def readFile(file_path):
-    text = ""
-    with open(file_path, mode="r", encoding="utf-8") as f:
-        for line in f.readlines():
-            text += line
-    return text
-
-def filter_schema(vector_store, schema, query, topK):
+def get_schema_based_query(vector_store, query, topK):
+    if topK == 0: topK = 5
     schema_filtered = ""
-    rag_answer = vector_store.similarity_search(schema, k=topK)
+    rag_answer = vector_store.similarity_search(query, k=topK)
+    print("=== RAG ANSWER ===\n")
+    for doc in rag_answer:
+        print(doc.metadata.get("raw_context"))
+        schema_filtered += doc.metadata.get("raw_context") + '\n'
+    return schema_filtered

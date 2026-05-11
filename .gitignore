@@ -2,5 +2,7 @@ myenv
 .env
 __pycache__
 db.sqlite3
-required.txt
+*.txt
 *.sqlite3
+save_model_2
+not_push

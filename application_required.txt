@@ -13,6 +13,8 @@
 + RAG lấy ít hơn số bảng cần thiết: Giải pháp
     + Lọc theo confident score
     + Graph based schema
+=> Chấp nhận lấy topK cứng
 + Model sinh sql sai: 
     + Cho thực hiện lại tối đa 3 lần cho chính xác
     + Sử dụng SQLGlot
+=> Done
