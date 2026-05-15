@@ -1,0 +1,154 @@
+/* Import font chữ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* === CÀI ĐẶT CHUNG === */
+body {
+    background-color: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh;
+    background: #1e293b;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* === HEADER === */
+.header {
+    padding: 20px;
+    background: #0f172a;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 20px;
+    color: #ef4444;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: -0.5px;
+}
+
+.cursor { animation: blink 1s step-end infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.status-indicator { color: #64748b; font-size: 13px; white-space: nowrap; }
+.separator { color: #475569; font-size: 16px; font-weight: 300; user-select: none; }
+
+.user-profile {
+    display: flex; align-items: center; gap: 8px;
+    color: #e2e8f0; font-size: 14px; font-weight: 500;
+    background: #0f172a; padding: 6px 12px;
+    border-radius: 6px; border: 1px solid #334155;
+    transition: all 0.2s ease; cursor: pointer;
+    font-family: 'Inter', sans-serif; outline: none; white-space: nowrap;
+}
+.user-profile:hover { border-color: #ef4444; color: #f87171; }
+.user-profile:hover svg { color: #ef4444; }
+.user-profile svg { color: #ef4444; transition: color 0.2s ease; }
+
+/* === MAIN LAYOUT === */
+.main-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    padding: 24px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.section-title {
+    font-family: 'JetBrains Mono', monospace;
+    color: #38bdf8;
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #334155;
+}
+
+/* === CỘT TRÁI: BẢNG USER === */
+.user-list-section {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.user-list-section::-webkit-scrollbar { width: 6px; }
+.user-list-section::-webkit-scrollbar-track { background: transparent; }
+.user-list-section::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; padding: 12px; color: #94a3b8; font-weight: 600; border-bottom: 2px solid #334155; }
+td { padding: 14px 12px; border-bottom: 1px solid #1e293b; color: #f8fafc; }
+tr:hover td { background: #1e293b; }
+
+.role-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.role-admin { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+.role-user { background: rgba(56, 189, 248, 0.1); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.2); }
+
+.btn-delete {
+    background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b;
+    padding: 6px 12px; border-radius: 4px; cursor: pointer;
+    font-size: 13px; transition: all 0.2s;
+}
+.btn-delete:hover { background: #991b1b; color: white; }
+
+/* === CỘT PHẢI: FORM THÊM USER === */
+.add-user-section {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.form-group { margin-bottom: 16px; }
+.form-group label {
+    display: block; margin-bottom: 8px; font-size: 13px; color: #cbd5e1;
+}
+.form-group input, .form-group select {
+    width: 100%; padding: 12px;
+    background: #1e293b; border: 1px solid #475569;
+    color: #f8fafc; border-radius: 6px; box-sizing: border-box;
+    font-family: 'Inter', sans-serif; font-size: 14px;
+    outline: none; transition: all 0.3s ease;
+}
+.form-group input:focus, .form-group select:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+/* Lớp CSS riêng cho input lỗi */
+.input-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
+}
+
+.btn-submit {
+    width: 100%; padding: 12px; margin-top: auto;
+    background: #0284c7; color: white;
+    border: none; border-radius: 6px;
+    font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.btn-submit:hover { background: #0369a1; }

@@ -19,8 +19,8 @@ class GenerateSQLCore:
             model_name, dtype=torch.bfloat16, device_map=device
         )
         self.device = device
-        # self.model = PeftModel.from_pretrained(base_model, adapter_path)
-        self.model = base_model
+        self.model = PeftModel.from_pretrained(base_model, adapter_path)
+        # self.model = base_model
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model.eval()
 
@@ -48,7 +48,7 @@ Schema: \n{schema}""",
                 f"Question: {query}\n\n"
                 f"You previously generated the following SQL which caused an error:\n{wrong_sql}\n\n"
                 f"Error Message from Database/Parser:\n{error_msg}\n\n"
-                f"Please fix the SQL query to resolve this exact error. Output only the corrected SQL."
+                f"Please fix the SQL query to resolve this exact error."
             )
         else:
             user_prompt = query

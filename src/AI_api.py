@@ -22,7 +22,7 @@ origins = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "http://localhost:8080",
-    "http://127.0.0.1:8080",
+    "http://127.0.0.1:8080"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -73,11 +73,11 @@ def generate_response(query, topK, reAct=4):
     forbidden_pattern = r'\b(INSERT|UPDATE|DELETE|DROP|ALTER|TRUNCATE|GRANT|REVOKE|REPLACE|EXECUTE)\b'
 
     print("- Đang trích xuất schema...")
-    filtered_schema = get_schema_based_query(vector_store, query, topK)
+    
     while count < reAct:
         try:
+            filtered_schema = get_schema_based_query(vector_store, query, topK + count)
             print("- Đang sinh lệnh SQL...")
-            
             sql_llm = gen_sql_system.generate(filtered_schema, query, wrong_sql, error_msg)
             wrong_sql = sql_llm
 
@@ -115,10 +115,3 @@ async def generate(request: InputText):
         generate_response, request.question, request.topK
     )
     return {"sql_query": sql_answer, "results": results}
-
-
-# sql_answer, results = generate_response(schema, prompt)
-# print("Lệnh SQL: ", sql_answer)
-# print("Kết quả: ", results)
-# for row in results:
-#     print(row)
